@@ -5,3 +5,4 @@ cabal.sandbox.config
 /dist
 lighttpd.conf
 redsift.config
+.stack-work/
