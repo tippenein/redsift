@@ -49,7 +49,7 @@ defaultConfigFile = "./Config/redsift.config"
 getDocumentRoot :: IO FilePath
 getDocumentRoot = do
     wwwExists <- doesDirectoryExist "www"
-    if wwwExists then return "www"
+    if wwwExists then getCurrentDirectory </> "www"
     else do
         cabalDataDir <- getDataDir
         cabalDataDirExists <- doesDirectoryExist cabalDataDir
