@@ -1,18 +1,17 @@
-{-# language OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Main where
 
 import Control.Exception
-import Data.ByteString (ByteString)
-import Data.Aeson (ToJSON(..), encode)
+import Data.Aeson                     (ToJSON (..), encode)
+import Data.ByteString                (ByteString)
 import Data.Maybe
 import Data.String.Conversions
-import Filesystem.Path.CurrentOS (decodeString)
-import Options.Applicative
 import Network.HTTP.Types
 import Network.Wai
-import Network.Wai.Handler.Warp hiding (Connection)
 import Network.Wai.Application.Static
+import Network.Wai.Handler.Warp       hiding (Connection)
 import Network.Wai.UrlMap
+import Options.Applicative
 import Safe
 import System.Directory
 import System.FilePath
@@ -20,9 +19,9 @@ import System.IO
 
 import Paths_redsift
 
+import Redsift.Config
 import Redsift.DB
 import Redsift.Exception
-import Redsift.Config
 
 
 -- * command line options

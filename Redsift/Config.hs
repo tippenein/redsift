@@ -1,5 +1,7 @@
-{-# language ScopedTypeVariables, OverloadedStrings, DataKinds,
-             FlexibleInstances #-}
+{-# LANGUAGE DataKinds           #-}
+{-# LANGUAGE FlexibleInstances   #-}
+{-# LANGUAGE OverloadedStrings   #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Redsift.Config (
     module Redsift.Config,
@@ -7,22 +9,22 @@ module Redsift.Config (
   ) where
 
 import Control.Applicative
-import Data.Configurator as C
+import Data.Configurator       as C
 import Data.Configurator.Types as C
 import Data.Text
-import Network.Mail.Mime (Address(..))
+import Network.Mail.Mime       (Address (..))
 
 
 -- * Config Data Type
 data RedsiftConfig = RedsiftConfig {
-    app :: AppConfig,
-    db :: DbConfig,
-    s3 :: S3Config,
+    app   :: AppConfig,
+    db    :: DbConfig,
+    s3    :: S3Config,
     email :: EmailConfig
   } deriving Show
 
 data AppConfig = AppConfig {
-    appPort :: Int,
+    appPort  :: Int,
     rowLimit :: Int
   } deriving Show
 
