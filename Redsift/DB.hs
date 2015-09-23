@@ -155,7 +155,7 @@ prepareQuery :: Address -> RsQuery -> IO RsQuery
 prepareQuery user q@RsQuery{ queryStrings } = do
     let withUserComment =
             printf "/* redsift query for user '%s' */ " (cs (addressEmail user) :: String) ++
-            intercalate " " queryStrings
+            unwords queryStrings
     hPutStrLn stderr ("redcat query: " ++ withUserComment)
     return q
 

@@ -36,14 +36,11 @@ optionsParser =
     info (helper <*> (Options <$> config)) fullDesc
   where
     config :: Parser (Maybe FilePath)
-    config = mkOptional $ strOption (
+    config = optional $ strOption (
         long "config" <>
         short 'c' <>
         metavar "CONFIGFILE" <>
         help ("config file path (default: " ++ defaultConfigFile ++ ")"))
-
-    mkOptional :: Parser a -> Parser (Maybe a)
-    mkOptional p = (Just <$> p) <|> pure Nothing
 
 defaultConfigFile :: FilePath
 defaultConfigFile = "./Config/redsift.config"
@@ -74,8 +71,7 @@ main = do
     let settings =
             setPort port $
             setBeforeMainLoop (hPutStrLn stderr ("listening on port " ++ show port)) $
-            setFdCacheDuration 0 $
-            defaultSettings
+            setFdCacheDuration 0 defaultSettings
     runSettings settings $ handleApp errorHandler $
         mapUrls (redsiftApp redsiftConfig documentRoot)
 
