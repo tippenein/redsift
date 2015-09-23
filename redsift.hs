@@ -1,18 +1,17 @@
-{-# language OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings #-}
 module Main where
 
 import Control.Exception
-import Data.ByteString (ByteString)
-import Data.Aeson (ToJSON(..), encode)
+import Data.Aeson                     (ToJSON (..), encode)
+import Data.ByteString                (ByteString)
 import Data.Maybe
 import Data.String.Conversions
-import Filesystem.Path.CurrentOS (decodeString)
-import Options.Applicative
 import Network.HTTP.Types
 import Network.Wai
-import Network.Wai.Handler.Warp hiding (Connection)
 import Network.Wai.Application.Static
+import Network.Wai.Handler.Warp       hiding (Connection)
 import Network.Wai.UrlMap
+import Options.Applicative
 import Safe
 import System.Directory
 import System.FilePath
@@ -20,9 +19,9 @@ import System.IO
 
 import Paths_redsift
 
+import Redsift.Config
 import Redsift.DB
 import Redsift.Exception
-import Redsift.Config
 
 
 -- * command line options
@@ -36,14 +35,11 @@ optionsParser =
     info (helper <*> (Options <$> config)) fullDesc
   where
     config :: Parser (Maybe FilePath)
-    config = mkOptional $ strOption (
+    config = optional $ strOption (
         long "config" <>
         short 'c' <>
         metavar "CONFIGFILE" <>
         help ("config file path (default: " ++ defaultConfigFile ++ ")"))
-
-    mkOptional :: Parser a -> Parser (Maybe a)
-    mkOptional p = (Just <$> p) <|> pure Nothing
 
 defaultConfigFile :: FilePath
 defaultConfigFile = "./Config/redsift.config"
@@ -74,8 +70,7 @@ main = do
     let settings =
             setPort port $
             setBeforeMainLoop (hPutStrLn stderr ("listening on port " ++ show port)) $
-            setFdCacheDuration 0 $
-            defaultSettings
+            setFdCacheDuration 0 defaultSettings
     runSettings settings $ handleApp errorHandler $
         mapUrls (redsiftApp redsiftConfig documentRoot)
 
@@ -88,7 +83,7 @@ redsiftApp redsiftConfig documentRoot =
 -- * file serving
 fileServerApp :: FilePath -> Application
 fileServerApp documentRoot =
-    staticApp (defaultFileServerSettings (decodeString (documentRoot ++ "/")))
+    staticApp (defaultFileServerSettings documentRoot)
 
 -- * api
 apiApp :: RedsiftConfig -> Application

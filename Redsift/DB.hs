@@ -1,36 +1,38 @@
+{-# LANGUAGE LambdaCase        #-}
+{-# LANGUAGE NamedFieldPuns    #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE NamedFieldPuns #-}
-{-# LANGUAGE LambdaCase #-}
 
 module Redsift.DB where
 
-import qualified Data.Aeson as Aeson
-import qualified Data.ByteString.UTF8 as BU
-import Data.List (foldl', elemIndices, intercalate, delete)
-import Data.Maybe (fromJust, fromMaybe)
-import qualified Database.PostgreSQL.LibPQ as PQ
-import Database.PostgreSQL.Simple as Simple
-import Database.PostgreSQL.Simple.Internal (withConnection)
-import qualified Data.Map as Map
-import qualified Data.Text as Text
-import Data.Char (isAlphaNum)
-import Data.Time (getCurrentTime, utctDay, formatTime)
-import Control.Concurrent (forkIO)
-import Network.AWS.S3Bucket
-import Network.AWS.AWSConnection
-import System.Locale
-import Control.Applicative
-import Control.Exception (bracket)
-import Safe
-import Data.String
-import Data.String.Conversions
-import Text.Printf
-import System.IO
+import           Control.Applicative
+import           Control.Concurrent                  (forkIO)
+import           Control.Exception                   (bracket)
+import qualified Data.Aeson                          as Aeson
+import qualified Data.ByteString.UTF8                as BU
+import           Data.Char                           (isAlphaNum)
+import           Data.List                           (delete, elemIndices,
+                                                      foldl', intercalate)
+import qualified Data.Map                            as Map
+import           Data.Maybe                          (fromJust, fromMaybe)
+import           Data.String
+import           Data.String.Conversions
+import qualified Data.Text                           as Text
+import           Data.Time                           (defaultTimeLocale,
+                                                      formatTime,
+                                                      getCurrentTime, utctDay)
+import qualified Database.PostgreSQL.LibPQ           as PQ
+import           Database.PostgreSQL.Simple          as Simple
+import           Database.PostgreSQL.Simple.Internal (withConnection)
+import           Network.AWS.AWSConnection
+import           Network.AWS.S3Bucket
+import           Safe
+import           System.IO
+import           Text.Printf
 
-import Redsift.Exception
-import Redsift.SignUrl
-import Redsift.Mail
-import Redsift.Config
+import           Redsift.Config
+import           Redsift.Exception
+import           Redsift.Mail
+import           Redsift.SignUrl
 
 newtype RsQuery = RsQuery { queryStrings :: [String] }
 
@@ -96,7 +98,7 @@ export :: DbConfig -> Address -> String -> RsQuery -> S3Config -> EmailConfig ->
 export dbConfig recipient reportName q s3Config emailConfig = do
   s3Prefix <- createS3Prefix recipient $ filter isAlphaNum reportName -- prevent reportName to have non-alpha nor non-numeric character
   _ <- forkIO $ mailUserExceptions emailConfig recipient $ mapExceptionIO sqlToUser $
-    withDB dbConfig $ \ db -> do
+    withDB dbConfig $ \ db ->
         withConnection db (\ raw -> escapeRsQuery raw q) >>= \case
             Nothing -> throwUserException "query escaping failed"
             Just escapedQuery -> do
@@ -155,7 +157,7 @@ prepareQuery :: Address -> RsQuery -> IO RsQuery
 prepareQuery user q@RsQuery{ queryStrings } = do
     let withUserComment =
             printf "/* redsift query for user '%s' */ " (cs (addressEmail user) :: String) ++
-            intercalate " " queryStrings
+            unwords queryStrings
     hPutStrLn stderr ("redcat query: " ++ withUserComment)
     return q
 

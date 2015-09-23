@@ -1,18 +1,19 @@
-{-# LANGUAGE DeriveDataTypeable, OverloadedStrings #-}
+{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE OverloadedStrings  #-}
 
 module Redsift.Exception where
 
 import Control.Exception
 import Control.Monad
-import Data.Typeable
 import Data.Monoid
+import Data.String.Conversions    (cs)
+import Data.Typeable
+import Database.PostgreSQL.Simple (SqlError (..))
+import Network.HTTP.Types         (internalServerError500)
 import Network.Wai
-import System.IO (hPutStrLn, stderr)
-import Data.String.Conversions (cs)
-import Network.HTTP.Types (internalServerError500)
-import Database.PostgreSQL.Simple (SqlError(..))
+import System.IO                  (hPutStrLn, stderr)
 
-import Redsift.Config hiding (app)
+import Redsift.Config             hiding (app)
 import Redsift.Mail
 
 
@@ -41,12 +42,12 @@ mailUserExceptions :: EmailConfig -> Address -> IO a -> IO a
 mailUserExceptions emailConfig recipient =
     handle $ \ e@(UserException m) -> do
         sendMail emailConfig recipient "Your Redsift Export Failed" $
-            unlines $
-                "We are very sorry, but your redsift export process did not go through successfully. Here's the error message:" :
-                m :
-                "" :
-                "Feel free to get in touch with the data science team." :
-                []
+            unlines
+                ["We are very sorry, but your redsift export process did not go through successfully. Here's the error message:",
+                m,
+                "",
+                "Feel free to get in touch with the data science team."
+                ]
         throwIO e
 
 sqlToUser :: SqlError -> UserException

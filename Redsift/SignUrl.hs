@@ -1,11 +1,12 @@
-{-# language OverloadedStrings, NamedFieldPuns #-}
+{-# LANGUAGE NamedFieldPuns    #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Redsift.SignUrl (signUrl, URI) where
 
 
-import Network.HTTP
 import Network.AWS.Authentication
 import Network.AWS.AWSConnection
+import Network.HTTP
 import Network.URI
 import System.FilePath
 
